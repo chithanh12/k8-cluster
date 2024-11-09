@@ -1,0 +1,16 @@
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: kong-client-ip-restriction
+  annotations:
+    kubernetes.io/ingress.class: "kong-external"
+plugin: "client-ip-restriction"
+config:
+  enabled: true 
+  allowed_ips:
+    b2b.admin.portal: 
+      - "10.244.0.1"
+    b2b.member.portal: 
+      - "*"
+    b2b.insurer.portal: 
+      - "10.8.0.0"

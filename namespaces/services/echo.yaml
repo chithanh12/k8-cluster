@@ -1,0 +1,42 @@
+replicaCount: 2
+
+image:
+  repository: ealen/echo-server
+  pullPolicy: Always 
+  # Overrides the image tag whose default is the chart appVersion.
+  tag: "latest"
+nameOverride: "echo"
+fullnameOverride: ""
+
+service:
+  annotations:
+    konghq.com/upstream-policy: "sample-customization"
+  type: ClusterIP
+  port: 80
+
+ingress:
+  enabled: true
+  className: "kong-external"
+  annotations: 
+    kubernetes.io/ingress.class: kong-external
+    # konghq.com/plugins: "kong-client-ip-restriction"
+    # konghq.com/hash-on: "header"                   # Specify the hash input type
+    # konghq.com/hash-on-header: "user-id"           # Specify which header to use for hashing
+    # konghq.com/hash-fallback: "cookie"             # Fallback if primary hash input is absent
+    # konghq.com/hash-fallback-cookie: "session-id"  # Specify which cookie to use as fallback
+    # konghq.com/slots: "1000"                       # Number of virtual nodes per target (default is 100)
+    # kubernetes.io/tls-acme: "true"
+  hosts:
+    - host: da.com 
+      paths:
+        - path: /echo
+          pathType: Prefix
+    - host: xxx.com
+      paths:
+        - path: /xxx
+          pathType: Prefix
+autoscaling:
+  enabled: true
+  minReplicas: 1
+  maxReplicas: 3
+  targetCPUUtilizationPercentage: 80

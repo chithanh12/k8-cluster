@@ -1,0 +1,36 @@
+redis:
+  nameOverride: iam-redis
+  architecture: standalone
+  commonAnnotations:
+    reloader.stakater.com/auto: "true"
+  serviceAccount:
+    name: iam-redis-sa
+  master:
+    disableCommands: []
+    extraFlags:
+      - "--maxmemory-policy allkeys-lru"
+    resources:
+      limits:
+        cpu: "200m"
+        memory: "256Mi"
+    persistence:
+      enabled: false
+    service:
+      type: NodePort
+      nodePorts:
+        redis: 32400
+  replica:
+    replicaCount: 1
+  pdb:
+    create: true
+    minAvailable: 1
+  networkPolicy:
+    enabled: false
+    extraIngress:
+      - from:
+        - podSelector:
+            matchLabels:
+              app: iam
+        ports:
+        - protocol: TCP
+          port: 6379

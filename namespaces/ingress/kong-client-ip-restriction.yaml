@@ -1,0 +1,118 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: custom-ingress
+  namespace: dev
+  annotations: 
+    kubernetes.io/ingress.class: kong-external
+spec:
+  rules:
+  - host: da-manual.com
+    http:
+      paths:
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: bootcamp-service
+            port:
+              number: 80
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: client-ip-restriction
+  namespace: ingress
+data:
+  handler.lua: |2-
+    -- handler.lua
+    local cjson = require "cjson"
+    local ClientIPRestriction = {
+      PRIORITY = 999,
+      VERSION = "1.0.0"
+    }
+
+    local function check_client_id(client_id, allowed_ips)
+      -- Get IP from X-Forwarded-For header
+      local ip = ngx.req.get_headers()['X-Forwarded-For']
+      if ip then
+        -- Split the header value if multiple IPs are present
+        ip = string.match(ip, "%S+")
+      else
+        -- Fallback to remote_addr if X-Forwarded-For is not present
+        ip = ngx.var.remote_addr
+      end
+
+      kong.log("2.Client IP: " .. ip .. "xxxx") -- Log the retrieved IP
+
+      if allowed_ips[client_id] then
+        for _, allowed_ip in ipairs(allowed_ips[client_id]) do
+          if allowed_ip == "*" or ip == allowed_ip then -- Allow "*" for all IPs
+            return true
+          end
+        end
+      end
+
+      return false
+    end
+
+    function ClientIPRestriction:access(conf)
+      kong.log.inspect(conf)
+      kong.log("++++++++++++") 
+      kong.log("ClientIPRestriction Configuration: " .. cjson.encode(conf)) 
+      kong.log("++++++++++++") 
+      if not conf.enabled then
+        kong.log("ClientIPRestriction plugin is disabled. Skipping.")
+        return 200  -- Return OK if disabled
+      end
+
+      local client_id = ngx.req.get_headers()['X-Client-ID']
+
+      if not client_id then
+        ngx.log(ngx.ERR, "Missing X-Client-ID header")
+        ngx.exit(401)
+        return 401
+      end
+      kong.log("1. Client ID: " .. client_id .. "xxxxx") -- Log the client ID
+
+      local allowed_ips = conf.allowed_ips or {}
+      if check_client_id(client_id, allowed_ips) then
+        return 200
+      else
+        ngx.header.content_type = 'application/json'
+        ngx.say(cjson.encode({
+          error = "Forbidden",
+          message = "Client IP is not allowed",
+        }))
+
+        ngx.exit(403)
+        return 403
+      end
+    end
+
+    return ClientIPRestriction
+
+  schema.lua: |-
+    -- schema.lua
+
+    return {
+      name = "client-ip-restriction",
+      fields = {
+        {
+          config = {
+            type = "record",
+            fields = {
+              { enabled = { type = "boolean", default = false } },
+              {
+                allowed_ips = {
+                  type = "map",
+                  description = "A table mapping client IDs to allowed IP addresses.",
+                  keys = { type = "string" },
+                  values = { type = "array", elements = { type = "string", } },
+                }
+              }
+            }
+          }
+        }
+      }
+    }

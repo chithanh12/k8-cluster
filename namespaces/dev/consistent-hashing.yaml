@@ -1,0 +1,12 @@
+---
+apiVersion: configuration.konghq.com/v1beta1
+kind: KongUpstreamPolicy
+metadata:
+  name: sample-customization
+spec:
+  algorithm: consistent-hashing
+  hashOn:
+    header: x-user-id
+  hashOnFallback:
+    input: ip
+  slots: 10 # default slots is 10.000

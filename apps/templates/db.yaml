@@ -1,0 +1,27 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: iam-redis
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "200"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  destination:
+    namespace: db
+    server: {{ .Values.cluster }}
+  project: {{ .Values.project }}
+  source:
+    repoURL: {{ .Values.repoURL }}
+    targetRevision: {{ .Values.repoBranch }}
+    path: redis/iam
+    helm:
+      version: v3
+      valueFiles: ['../iam-values.yaml']
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true

@@ -17,13 +17,14 @@ kong:
     KONG_CLIENT_MAX_BODY_SIZE: 256m
     KONG_CLIENT_BODY_BUFFER_SIZE: 256m
     opentelemetry_tracing: all
+    PLUGINS: bundled,client-ip-restriction
   autoscaling:
     enabled: true
-    minReplicas: 2
-    maxReplicas: 3
+    minReplicas: 1
+    maxReplicas: 2
   podDisruptionBudget:
-    enabled: true
-    maxUnavailable: "50%"
+    enabled: false
+    maxUnavailable: "0%"
   serviceMonitor:
     enabled: true
     namespace: monitoring
@@ -62,3 +63,7 @@ kong:
       servicePort: 80
       containerPort: 8000
       nodePort: 32080
+  plugins:
+    configMaps:
+      - pluginName: client-ip-restriction
+        name: client-ip-restriction 

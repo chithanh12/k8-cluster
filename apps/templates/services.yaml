@@ -1,0 +1,67 @@
+{{ range .Values.daServices }}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: {{.}}-dev
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "100"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: {{ $.Values.project }}
+  destination:
+    namespace: dev
+    server: {{ $.Values.cluster }}
+  source:
+    repoURL: {{ $.Values.repoURL }}
+    targetRevision: {{ $.Values.repoBranch }}
+    path: microservices
+    helm: 
+      valueFiles: ['../namespaces/services/{{ . }}.yaml']
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - RespectIgnoreDifferences=true
+  ignoreDifferences:
+  - kind: Service
+    jsonPointers:
+    - /spec/selector
+
+{{ end }}
+---
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: namespace-dev
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "100"
+  finalizers:
+    - resources-finalizer.argocd.argoproj.io
+spec:
+  project: {{ $.Values.project }}
+  destination:
+    namespace: dev
+    server: {{ $.Values.cluster }}
+  source:
+    repoURL: {{ $.Values.repoURL }}
+    targetRevision: {{ $.Values.repoBranch }}
+    path: namespaces/dev
+
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - RespectIgnoreDifferences=true
+  ignoreDifferences:
+  - kind: Service
+    jsonPointers:
+    - /spec/selector
