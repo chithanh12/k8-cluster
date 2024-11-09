@@ -1,0 +1,64 @@
+kong:
+  fullnameOverride: kong
+  env:
+    database: "off"
+    nginx_worker_processes: "4"
+    proxy_access_log: /dev/stdout
+    admin_access_log: /dev/stdout
+    admin_gui_access_log: /dev/stdout
+    portal_api_access_log: /dev/stdout
+    proxy_error_log: /dev/stderr
+    admin_error_log: /dev/stderr
+    admin_gui_error_log: /dev/stderr
+    portal_api_error_log: /dev/stderr
+    prefix: /kong_prefix/
+    real_ip_header: "X-Forwarded-For"
+    headers: "latency_tokens"
+    KONG_CLIENT_MAX_BODY_SIZE: 256m
+    KONG_CLIENT_BODY_BUFFER_SIZE: 256m
+    opentelemetry_tracing: all
+  autoscaling:
+    enabled: true
+    minReplicas: 2
+    maxReplicas: 3
+  podDisruptionBudget:
+    enabled: true
+    maxUnavailable: "50%"
+  serviceMonitor:
+    enabled: true
+    namespace: monitoring
+  affinity:
+    podAntiAffinity:
+      preferredDuringSchedulingIgnoredDuringExecution:
+      - weight: 100
+        podAffinityTerm:
+          labelSelector:
+            matchExpressions:
+            - key: app.kubernetes.io/instance
+              operator: In
+              values:
+              - kong-internal
+          topologyKey: topology.kubernetes.io/zone
+  
+  ingressController:
+    ingressClass: kong-external
+    env:
+      CONTROLLER_INGRESS_CLASS: kong-external
+    enabled: true
+    resources:
+      requests:
+        cpu: 150m
+        memory: 800Mi
+      limits:
+        cpu: 400m
+        memory: 1500Mi
+  proxy:
+    enabled: true
+    type: NodePort
+    labels:
+      enable-metrics: "true"
+    http:
+      enabled: true
+      servicePort: 80
+      containerPort: 8000
+      nodePort: 32080
