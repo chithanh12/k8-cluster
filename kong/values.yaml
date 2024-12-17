@@ -31,16 +31,16 @@ kong:
   affinity:
     podAntiAffinity:
       preferredDuringSchedulingIgnoredDuringExecution:
-      - weight: 100
-        podAffinityTerm:
-          labelSelector:
-            matchExpressions:
-            - key: app.kubernetes.io/instance
-              operator: In
-              values:
-              - kong-internal
-          topologyKey: topology.kubernetes.io/zone
-  
+        - weight: 100
+          podAffinityTerm:
+            labelSelector:
+              matchExpressions:
+                - key: app.kubernetes.io/instance
+                  operator: In
+                  values:
+                    - kong-internal
+            topologyKey: topology.kubernetes.io/zone
+
   ingressController:
     ingressClass: kong-external
     env:
@@ -53,6 +53,14 @@ kong:
       limits:
         cpu: 400m
         memory: 1500Mi
+  admin:
+    enabled: true
+    tls:
+      enabled: false
+      servicePort: 8444
+      containerPort: 8444
+      nodePort: 32445
+      parameters: []
   proxy:
     enabled: true
     type: NodePort
@@ -66,4 +74,4 @@ kong:
   plugins:
     configMaps:
       - pluginName: client-ip-restriction
-        name: client-ip-restriction 
+        name: client-ip-restriction
