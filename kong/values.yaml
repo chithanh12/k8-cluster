@@ -55,6 +55,10 @@ kong:
         memory: 1500Mi
   admin:
     enabled: true
+    http:
+      enabled: true
+      servicePort: 8001
+      containerPort: 8001
     tls:
       enabled: false
       servicePort: 8444
