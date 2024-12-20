@@ -5,6 +5,6 @@ metadata:
   namespace: dev
 plugin: canary
 config:
-  enabled: false
+  enabled: true
   canary_upstream_host: hello-dev.dev
   canary_upstream_port: 80
