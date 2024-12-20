@@ -12,7 +12,7 @@ spec:
   source:
     repoURL: 'git@github.com:chithanh12/k8s-cluster.git'
     path: apps
-    targetRevision: HEAD
+    targetRevision: test/consistent-hashing
   destination:
     server: 'https://kubernetes.default.svc'
     namespace: argocd
