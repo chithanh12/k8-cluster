@@ -5,7 +5,7 @@ image:
   pullPolicy: Always 
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
-nameOverride: "echo"
+nameOverride: "hello"
 fullnameOverride: ""
 
 service:
@@ -20,13 +20,9 @@ ingress:
   annotations: 
     kubernetes.io/ingress.class: kong-external
   hosts:
-    - host: da.com 
+    - host: hello.com 
       paths:
         - path: /echo
-          pathType: Prefix
-    - host: xxx.com
-      paths:
-        - path: /xxx
           pathType: Prefix
 autoscaling:
   enabled: true

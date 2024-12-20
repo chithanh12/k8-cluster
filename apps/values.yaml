@@ -6,3 +6,4 @@ clusterName: k8s-cluster
 
 daServices:
   - echo 
+  - hello
