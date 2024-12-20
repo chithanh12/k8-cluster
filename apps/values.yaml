@@ -1,7 +1,7 @@
 cluster: https://kubernetes.default.svc
 project: default
 repoURL: git@github.com:chithanh12/k8s-cluster.git
-repoBranch: master
+repoBranch: test/consistent-hashing
 clusterName: k8s-cluster 
 
 daServices:
