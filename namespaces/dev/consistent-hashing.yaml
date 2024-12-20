@@ -9,4 +9,4 @@ spec:
     header: x-user-id
   hashOnFallback:
     input: ip
-  slots: 10 # default slots is 10.000
+  slots: 10000 # default slots is 10.000
