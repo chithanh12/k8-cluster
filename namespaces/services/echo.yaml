@@ -19,6 +19,7 @@ ingress:
   className: "kong-external"
   annotations: 
     kubernetes.io/ingress.class: kong-external
+    konghq.com/plugins: "echo-canary"
   hosts:
     - host: da.com 
       paths:

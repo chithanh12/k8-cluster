@@ -1,0 +1,51 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: kong-plugin-canary
+  namespace: ingress
+data:
+  handler.lua: |2-
+
+    -- handler.lua
+
+    local cjson = require "cjson"
+
+    local CanaryHandler = {
+      PRIORITY = 999,
+      VERSION = "0.0.1"
+    }
+
+    function CanaryHandler:access(conf)
+      kong.log.inspect(conf)
+
+      if conf.enabled then
+        local upstream_host = conf.canary_upstream_host
+        if upstream_host then
+          local upstream_port = conf.canary_upstream_port
+          kong.log('Canary upstream: ', upstream_host, ', Canary Upstream Port: ', upstream_port)
+          
+          ngx.ctx.balancer_data.host = upstream_host
+          ngx.ctx.balancer_data.port = upstream_port
+          kong.log("Configuration ", cjson.encode(conf))
+        end
+      end
+    end
+
+    return CanaryHandler
+
+  schema.lua: |-
+    -- schema.lua
+    return {
+      name = "canary",
+      fields = {
+        { config = {
+            type = "record",
+            fields = {
+                  { enabled = { type = "boolean", default = false } },
+                  { canary_upstream_host = { type = "string", default = nil } },
+                  { canary_upstream_port = { type = "number", between = { 1, 65534 }, default = 80 } },
+            },
+          },
+        },
+      },
+    }

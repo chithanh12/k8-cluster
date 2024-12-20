@@ -17,7 +17,7 @@ kong:
     KONG_CLIENT_MAX_BODY_SIZE: 256m
     KONG_CLIENT_BODY_BUFFER_SIZE: 256m
     opentelemetry_tracing: all
-    PLUGINS: bundled,client-ip-restriction
+    PLUGINS: bundled,client-ip-restriction,canary
   autoscaling:
     enabled: true
     minReplicas: 1
@@ -79,3 +79,5 @@ kong:
     configMaps:
       - pluginName: client-ip-restriction
         name: client-ip-restriction
+      - pluginName: canary
+        name: kong-plugin-canary

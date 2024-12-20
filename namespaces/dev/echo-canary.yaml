@@ -1,0 +1,10 @@
+apiVersion: configuration.konghq.com/v1
+kind: KongPlugin
+metadata:
+  name: echo-canary
+  namespace: dev
+plugin: canary
+config:
+  enabled: false
+  canary_upstream_host: hello-dev.dev
+  canary_upstream_port: 80
