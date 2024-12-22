@@ -16,10 +16,7 @@ spec:
       port: 80
       protocol: TCP
       targetPort: 80
-    - name: containerport
-      port: 80
-      protocol: TCP
-      targetPort: 80
+
   selector:
     app: iam
     env: dev
