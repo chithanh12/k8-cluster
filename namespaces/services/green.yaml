@@ -28,7 +28,7 @@ ingress:
         - path: /
           pathType: Prefix
 autoscaling:
-  enabled: true
+  enabled: false
   minReplicas: 0
   maxReplicas: 3
   targetCPUUtilizationPercentage: 80
