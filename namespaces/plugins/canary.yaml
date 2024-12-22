@@ -24,9 +24,12 @@ data:
           local upstream_port = conf.canary_upstream_port
           kong.log('Canary upstream: ', upstream_host, ', Canary Upstream Port: ', upstream_port)
           
-          ngx.ctx.balancer_data.host = upstream_host
-          ngx.ctx.balancer_data.port = upstream_port
-          kong.log("Configuration ", cjson.encode(conf))
+          -- Dynamically set the upstream host and port
+          local balancer = require "kong.runloop.balancer"
+          balancer.set_host_and_port(target_upstream, 80) -- Change port if necessary
+          -- ngx.ctx.balancer_data.host = upstream_host
+          -- ngx.ctx.balancer_data.port = upstream_port
+           kong.log("Configuration ", cjson.encode(conf))
         end
       end
     end
