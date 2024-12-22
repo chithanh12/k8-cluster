@@ -1,22 +1,22 @@
-apiVersion: networking.k8s.io/v1
-kind: Ingress
-metadata:
-  name: custom-ingress
-  namespace: dev
-  annotations: 
-    kubernetes.io/ingress.class: kong-external
-spec:
-  rules:
-  - host: da-manual.com
-    http:
-      paths:
-      - path: /
-        pathType: Prefix
-        backend:
-          service:
-            name: bootcamp-service
-            port:
-              number: 80
+# apiVersion: networking.k8s.io/v1
+# kind: Ingress
+# metadata:
+#   name: custom-ingress
+#   namespace: dev
+#   annotations: 
+#     kubernetes.io/ingress.class: kong-external
+# spec:
+#   rules:
+#   - host: da-manual.com
+#     http:
+#       paths:
+#       - path: /
+#         pathType: Prefix
+#         backend:
+#           service:
+#             name: bootcamp-service
+#             port:
+#               number: 80
 ---
 apiVersion: v1
 kind: ConfigMap
