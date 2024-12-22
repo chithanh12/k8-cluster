@@ -2,7 +2,7 @@
 apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: {{ include "microservices.fullname" . }}
+  name: {{ .Values.app.env }}-{{ .Values.app.name }}-{{ .Values.app.slot }}
   labels:
     {{- include "microservices.labels" . | nindent 4 }}
   {{- with .Values.ingress.annotations }}
