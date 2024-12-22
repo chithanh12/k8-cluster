@@ -16,4 +16,8 @@ spec:
       protocol: TCP
       name: http
   selector:
+    app: {{ .Values.app.name }}
+    env: {{ .Values.app.env }}
+    slot: {{ .Values.app.slot }}
+    release: {{ .Release.Name }}
     {{- include "microservices.selectorLabels" . | nindent 4 }}

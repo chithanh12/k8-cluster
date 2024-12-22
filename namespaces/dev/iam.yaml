@@ -1,0 +1,49 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: iam
+    env: dev
+  name: iam
+  annotations:
+    #konghq.com/plugins: zipkin,prometheus
+    konghq.com/upstream-policy: "sample-customization"
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+spec:
+  ports:
+    - name: serviceport
+      port: 80
+      protocol: TCP
+      targetPort: 80
+    - name: containerport
+      port: 80
+      protocol: TCP
+      targetPort: 80
+  selector:
+    app: iam
+    env: dev
+    slot: blue
+  type: ClusterIP
+---
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: dev-iam-external
+  namespace: dev
+  annotations:
+    kubernetes.io/ingress.class: kong-external
+    argocd.argoproj.io/compare-options: IgnoreExtraneous
+    konghq.com/strip-path: "true"
+spec:
+  rules:
+    - host: iam.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: iam
+                port:
+                  number: 80

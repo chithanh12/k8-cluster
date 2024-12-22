@@ -1,16 +1,20 @@
-replicaCount: 2
+replicaCount: 0
+app:
+  name: iam
+  env: dev
+  slot: green
 
 image:
   repository: ealen/echo-server
   pullPolicy: Always 
   # Overrides the image tag whose default is the chart appVersion.
   tag: "latest"
-nameOverride: "hello"
+nameOverride: "iam-green"
 fullnameOverride: ""
 
 service:
-  annotations:
-    konghq.com/upstream-policy: "sample-customization"
+  # annotations:
+    # konghq.com/upstream-policy: "sample-customization"
   type: ClusterIP
   port: 80
 
@@ -19,13 +23,14 @@ ingress:
   className: "kong-external"
   annotations: 
     kubernetes.io/ingress.class: kong-external
+    # konghq.com/plugins: "echo-canary"
   hosts:
-    - host: hello.com 
+    - host: iam-green.com 
       paths:
-        - path: /echo
+        - path: /
           pathType: Prefix
 autoscaling:
   enabled: true
-  minReplicas: 1
+  minReplicas: 0
   maxReplicas: 3
   targetCPUUtilizationPercentage: 80

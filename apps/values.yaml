@@ -5,5 +5,5 @@ repoBranch: test/consistent-hashing
 clusterName: k8s-cluster 
 
 daServices:
-  - echo 
-  - hello
+  - blue
+  - green
