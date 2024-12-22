@@ -1,16 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "microservices.fullname" . }}
+  name: {{ .Values.app.env }}-{{ .Values.app.name }}-{{ .Values.app.slot }}
   labels:
-    {{- include "microservices.labels" . | nindent 4 }}
+    app: {{ .Values.app.name }}
+    env: {{ .Values.app.env }}
+    slot: {{ .Values.app.slot }}
+    release: {{ .Release.Name }}
 spec:
   {{- if not .Values.autoscaling.enabled }}
   replicas: {{ .Values.replicaCount }}
   {{- end }}
   selector:
     matchLabels:
-      {{- include "microservices.selectorLabels" . | nindent 6 }}
+      app: {{ .Values.app.name }}
+      env: {{ .Values.app.env }}
+      slot: {{ .Values.app.slot }}
+      release: {{ .Release.Name }}
   template:
     metadata:
       {{- with .Values.podAnnotations }}
@@ -18,10 +24,10 @@ spec:
         {{- toYaml . | nindent 8 }}
       {{- end }}
       labels:
-        {{- include "microservices.labels" . | nindent 8 }}
-        {{- with .Values.podLabels }}
-        {{- toYaml . | nindent 8 }}
-        {{- end }}
+        app: {{ .Values.app.name }}
+        env: {{ .Values.app.env }}
+        slot: {{ .Values.app.slot }}
+        release: {{ .Release.Name }}
     spec:
       {{- with .Values.imagePullSecrets }}
       imagePullSecrets:
@@ -31,7 +37,7 @@ spec:
       securityContext:
         {{- toYaml .Values.podSecurityContext | nindent 8 }}
       containers:
-        - name: {{ .Chart.Name }}
+        - name: {{ .Values.app.env }}-{{ .Values.app.name }}-{{ .Values.app.slot }}
           securityContext:
             {{- toYaml .Values.securityContext | nindent 12 }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
